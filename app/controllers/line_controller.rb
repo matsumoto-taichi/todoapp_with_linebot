@@ -1,21 +1,16 @@
+# line-bot-apiのインポート
+require 'line/bot'
+
 class LineController < ApplicationController
-  # line-bot-apiのインポート
-  require 'line/bot'
   # Railsのあるセキュリティ対策を無効化
   protect_from_forgery :except => [:bot]
+  # LINE以外からのアクセスの場合エラーを返す
+  before_action :validate_signature
 
   # LINEでメッセージを送るとこのアクションメソッドbotが走る
   def bot
     # LINEで送られてきたメッセージのデータを取得
     body = request.body.read
-
-    # LINE以外からのアクセスの場合エラーを返す
-    signature = request.env['HTTP_X_LINE_SIGNATURE']
-    unless client.validate_signature(body, signature)
-      error 400 do
-        'Bad Request'
-      end
-    end
 
     # LINEで送られてきたメッセージのデータeventsというデータ構造に変更
     events = client.parse_events_from(body)
@@ -62,5 +57,17 @@ class LineController < ApplicationController
       config.channel_secret = ENV['LINE_CHANNEL_SECRET']
       config.channel_token = ENV['LINE_CHANNEL_TOKEN']
     }
+  end
+
+  # LINE以外からのアクセスの場合エラーを返す
+  private
+  def validate_signature
+    body = request.body.read
+    signature = request.env['HTTP_X_LINE_SIGNATURE']
+    unless client.validate_signature(body, signature)
+      error 400 do
+        'Bad Request'
+      end
+    end
   end
 end
