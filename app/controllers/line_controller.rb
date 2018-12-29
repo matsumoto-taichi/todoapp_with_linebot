@@ -1,7 +1,6 @@
-# line-bot-apiのインポート
-require 'line/bot'
-
 class LineController < ApplicationController
+  # line-bot-apiのインポート
+  require 'line/bot'
   # Railsのあるセキュリティ対策を無効化
   protect_from_forgery :except => [:bot]
 
@@ -9,6 +8,12 @@ class LineController < ApplicationController
   def bot
     # LINEで送られてきたメッセージのデータを取得
     body = request.body.read
+
+    # LINE以外からのアクセスの場合エラーを返す
+    signature = request.env['HTTP_X_LINE_SIGNATURE']
+    unless client.validate_signature(body, signature)
+      puts "bad request status 400"
+    end
 
     # LINEで送られてきたメッセージのデータeventsというデータ構造に変更
     events = client.parse_events_from(body)
@@ -22,7 +27,7 @@ class LineController < ApplicationController
         case event.type
         when Line::Bot::Event::MessageType::Text
           # メッセージの文字列を取得して、変数taskに代入
-          task = event['message']['text']
+          task = event.message['text']
 
           # DBへの登録処理開始
           begin
@@ -33,7 +38,7 @@ class LineController < ApplicationController
                 type: 'text',
                 text: "タスク『#{task}』を登録しました！"
             }
-            client.push('U8ab60a986b1ebdfb150113cbee4187ff', message)
+            client.reply_message(event['replyToken'], message)
           rescue
             # 登録に失敗した場合、登録に失敗した旨をLINEで返す
             message = {
@@ -56,5 +61,4 @@ class LineController < ApplicationController
       config.channel_token = ENV['LINE_CHANNEL_TOKEN']
     }
   end
-
 end
