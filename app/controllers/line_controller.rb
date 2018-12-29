@@ -47,7 +47,7 @@ class LineController < ApplicationController
         end
       end
     }
-    head :ok
+    head "ok"
   end
 
   # LINEボットを生成して返すプライベートメソッドの定義
