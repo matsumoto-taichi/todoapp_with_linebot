@@ -38,7 +38,7 @@ class LineController < ApplicationController
                 type: 'text',
                 text: "タスク『#{task}』を登録しました！"
             }
-            client.push_message(event['source']['userId'], message)
+            client.reply_message(event['replyToken'], message)
             puts message
           rescue
             # 登録に失敗した場合、登録に失敗した旨をLINEで返す
