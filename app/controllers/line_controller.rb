@@ -3,7 +3,7 @@ require 'line/bot'
 
 class LineController < ApplicationController
   # Railsのあるセキュリティ対策を無効化
-  protect_from_forgery :except => [:bot]
+  protect_from_forgery except: :bot
 
   # LINEでメッセージを送るとこのアクションメソッドbotが走る
   def bot
