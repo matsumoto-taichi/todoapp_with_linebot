@@ -1,6 +1,7 @@
+# line-bot-apiのインポート
+require 'line/bot'
+
 class LineController < ApplicationController
-  # line-bot-apiのインポート
-  require 'line/bot'
   # Railsのあるセキュリティ対策を無効化
   protect_from_forgery :except => [:bot]
 
