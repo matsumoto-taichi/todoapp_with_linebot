@@ -29,6 +29,9 @@ class LineController < ApplicationController
         when Line::Bot::Event::MessageType::Text
           # メッセージの文字列を取得して、変数taskに代入
           task = event.message['text']
+          reply_token = event['replyToken']
+
+          puts reply_token
 
           # DBへの登録処理開始
           begin
@@ -39,7 +42,7 @@ class LineController < ApplicationController
                 type: 'text',
                 text: "タスク『#{task}』を登録しました！"
             }
-            client.reply_message(event['replyToken'], message)
+            client.reply_message(reply_token, message)
             puts message
           rescue
             # 登録に失敗した場合、登録に失敗した旨をLINEで返す
@@ -47,7 +50,7 @@ class LineController < ApplicationController
                 type: 'text',
                 text: "タスク『#{task}』の登録に失敗しました。"
             }
-            client.reply_message(event['replyToken'], message)
+            client.reply_message(reply_token, message)
           end
         end
       end
