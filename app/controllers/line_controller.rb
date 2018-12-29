@@ -13,7 +13,7 @@ class LineController < ApplicationController
     # LINE以外からのアクセスの場合エラーを返す
     signature = request.env['HTTP_X_LINE_SIGNATURE']
     unless client.validate_signature(body, signature)
-      render status: 400
+      head :bad_request
     end
 
     # LINEで送られてきたメッセージのデータeventsというデータ構造に変更
@@ -52,7 +52,7 @@ class LineController < ApplicationController
         end
       end
     }
-    render status: 200
+    head :ok
   end
 
   # LINEボットを生成して返すプライベートメソッドの定義
