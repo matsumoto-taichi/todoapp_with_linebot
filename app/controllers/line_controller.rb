@@ -3,7 +3,7 @@ require 'line/bot'
 
 class LineController < ApplicationController
   # Railsのあるセキュリティ対策を無効化
-  protect_from_forgery except: :bot
+  protect_from_forgery :except => [:bot]
 
   # LINEでメッセージを送るとこのアクションメソッドbotが走る
   def bot
@@ -28,10 +28,7 @@ class LineController < ApplicationController
         case event.type
         when Line::Bot::Event::MessageType::Text
           # メッセージの文字列を取得して、変数taskに代入
-          task = event.message['text']
-          reply_token = event['replyToken']
-
-          puts reply_token
+          task = event['message']['text']
 
           # DBへの登録処理開始
           begin
@@ -42,15 +39,14 @@ class LineController < ApplicationController
                 type: 'text',
                 text: "タスク『#{task}』を登録しました！"
             }
-            client.reply_message(reply_token, message)
-            puts message
+            client.reply_message(event['replyToken'], message)
           rescue
             # 登録に失敗した場合、登録に失敗した旨をLINEで返す
             message = {
                 type: 'text',
                 text: "タスク『#{task}』の登録に失敗しました。"
             }
-            client.reply_message(reply_token, message)
+            client.reply_message(event['replyToken'], message)
           end
         end
       end
@@ -62,8 +58,8 @@ class LineController < ApplicationController
   private
   def client
     @client ||= Line::Bot::Client.new {|config|
-      config.channel_secret = ENV['LINE_CHANNEL_SECRET']
-      config.channel_token = ENV['LINE_CHANNEL_TOKEN']
+      config.channel_secret = ENV["LINE_CHANNEL_SECRET"]
+      config.channel_token = ENV["LINE_CHANNEL_TOKEN"]
     }
   end
 end
