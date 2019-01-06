@@ -1,7 +1,6 @@
 <h1 class="h4">タスク編集画面</h1>
-<%= form_tag(task_update_path, method: :post) do %>
+<%= form_tag(task_update_path(@task), method: :post) do %>
   <div class="form-group">
-    <%= hidden_field_tag :id, @task.id %>
     <%= text_area_tag :task, @task.task, class: 'form-control' %>
   </div>
   <div class="actions pb-5">
